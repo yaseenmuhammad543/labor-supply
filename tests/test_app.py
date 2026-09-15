@@ -107,26 +107,25 @@ def test_worker_can_apply_to_job(client):
 
 
 def test_admin_can_view_platform_data_and_disable_user(client):
-    login = client.post('/api/login', json={
+    login = client.post('/admin/api/login', json={
         'email': 'admin@laborsupply.in',
         'password': 'admin123',
-        'role': 'admin'
     })
     assert login.status_code == 200
 
-    dashboard = client.get('/api/admin/overview')
+    dashboard = client.get('/admin/api/overview')
     assert dashboard.status_code == 200
     assert dashboard.get_json()['stats']['workers'] >= 1
 
-    users = client.get('/api/admin/users')
+    users = client.get('/admin/api/users')
     assert users.status_code == 200
     arun = next(user for user in users.get_json()['users'] if user['email'] == 'arun@example.com')
 
-    response = client.patch(f"/api/admin/users/{arun['id']}", json={'is_active': False})
+    response = client.patch(f"/admin/api/users/{arun['id']}", json={'is_active': False})
     assert response.status_code == 200
     assert response.get_json()['user']['is_active'] is False
 
-    hide_job = client.patch('/api/admin/jobs/1', json={'verified': False})
+    hide_job = client.patch('/admin/api/jobs/1', json={'verified': False})
     assert hide_job.status_code == 200
     public_jobs = client.get('/api/jobs')
     assert all(job['id'] != 1 for job in public_jobs.get_json()['jobs'])
@@ -137,3 +136,23 @@ def test_admin_can_view_platform_data_and_disable_user(client):
         'role': 'worker'
     })
     assert worker_login.status_code == 403
+
+
+def test_admin_has_separate_namespace(client):
+    public_admin_page = client.get('/pages/admin-login.html')
+    assert public_admin_page.status_code == 404
+
+    admin_page = client.get('/admin/admin-login.html')
+    assert admin_page.status_code == 200
+
+    public_admin_api = client.get('/api/admin/overview')
+    assert public_admin_api.status_code == 404
+
+    admin_login = client.post('/admin/api/login', json={
+        'email': 'admin@laborsupply.in',
+        'password': 'admin123',
+    })
+    assert admin_login.status_code == 200
+
+    overview = client.get('/admin/api/overview')
+    assert overview.status_code == 200

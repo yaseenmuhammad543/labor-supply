@@ -16,13 +16,13 @@
     <header class="site-header">
       <nav class="navbar navbar-expand-lg">
         <div class="container">
-          <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+          <a class="navbar-brand d-flex align-items-center gap-2" href="/">
             <span class="brand-mark"><i class="fa-solid fa-briefcase"></i></span>
             <span class="brand-text">Labor Supply</span>
           </a>
           <div class="nav-actions ms-auto d-flex align-items-center gap-2">
-            <a class="btn btn-link btn-login" href="login.html">Worker Login</a>
-            <a class="btn btn-primary" href="employer-login.html">Employer Login</a>
+            <a class="btn btn-link btn-login" href="/pages/login.html">Worker Login</a>
+            <a class="btn btn-primary" href="/pages/employer-login.html">Employer Login</a>
           </div>
         </div>
       </nav>
@@ -36,7 +36,7 @@
           <p>Manage users, jobs, qualifications, and platform compliance.</p>
         </div>
 
-        <form>
+        <form data-admin-login-form>
           <div class="form-field">
             <label for="admin-email">Admin email</label>
             <input id="admin-email" name="email" type="email" placeholder="admin@laborsupply.com" required />

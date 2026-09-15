@@ -258,6 +258,15 @@ def index_html():
 
 @app.route('/pages/<path:filename>')
 def serve_pages(filename: str):
+    if os.path.basename(filename).startswith('admin-'):
+        return jsonify({'error': 'Not found'}), 404
+    return send_from_directory(os.path.join(BASE_DIR, 'pages'), filename)
+
+
+@app.route('/admin/<path:filename>')
+def serve_admin_pages(filename: str):
+    if not os.path.basename(filename).startswith('admin-'):
+        return jsonify({'error': 'Not found'}), 404
     return send_from_directory(os.path.join(BASE_DIR, 'pages'), filename)
 
 
@@ -281,7 +290,7 @@ def health():
     return jsonify({'status': 'ok', 'app': 'labor-supply'})
 
 
-@app.route('/api/admin/overview')
+@app.route('/admin/api/overview')
 def admin_overview():
     _, error = require_admin()
     if error:
@@ -297,7 +306,7 @@ def admin_overview():
     })
 
 
-@app.route('/api/admin/users')
+@app.route('/admin/api/users')
 def admin_users():
     _, error = require_admin()
     if error:
@@ -306,7 +315,7 @@ def admin_users():
     return jsonify({'success': True, 'users': users})
 
 
-@app.route('/api/admin/users/<int:user_id>', methods=['PATCH'])
+@app.route('/admin/api/users/<int:user_id>', methods=['PATCH'])
 def update_admin_user(user_id: int):
     _, error = require_admin()
     if error:
@@ -322,7 +331,7 @@ def update_admin_user(user_id: int):
     return jsonify({'success': True, 'user': user.to_dict()})
 
 
-@app.route('/api/admin/jobs')
+@app.route('/admin/api/jobs')
 def admin_jobs():
     _, error = require_admin()
     if error:
@@ -331,7 +340,7 @@ def admin_jobs():
     return jsonify({'success': True, 'jobs': jobs})
 
 
-@app.route('/api/admin/jobs/<int:job_id>', methods=['PATCH'])
+@app.route('/admin/api/jobs/<int:job_id>', methods=['PATCH'])
 def update_admin_job(job_id: int):
     _, error = require_admin()
     if error:
@@ -347,7 +356,7 @@ def update_admin_job(job_id: int):
     return jsonify({'success': True, 'job': job.to_dict()})
 
 
-@app.route('/api/admin/applications/<int:application_id>', methods=['PATCH'])
+@app.route('/admin/api/applications/<int:application_id>', methods=['PATCH'])
 def update_admin_application(application_id: int):
     _, error = require_admin()
     if error:
@@ -467,6 +476,9 @@ def login():
     password = str(payload.get('password') or '')
     role = (payload.get('role') or 'worker').strip().lower()
 
+    if role == 'admin':
+        return jsonify({'success': False, 'message': 'Use the admin login'}), 403
+
     user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({'success': False, 'message': 'User not found'}), 401
@@ -486,6 +498,23 @@ def login():
         'message': 'Login successful',
         'user': clean_user(user),
     })
+
+
+@app.route('/admin/api/login', methods=['POST'])
+def admin_login():
+    payload = request.get_json(silent=True) or {}
+    email = (payload.get('email') or '').strip().lower()
+    password = str(payload.get('password') or '')
+    user = User.query.filter_by(email=email, role='admin').first()
+    if not user or not check_password_hash(user.password_hash, password):
+        return jsonify({'success': False, 'message': 'Invalid admin credentials'}), 401
+    if not user.is_active:
+        return jsonify({'success': False, 'message': 'This admin account is disabled'}), 403
+
+    session['user_id'] = user.id
+    session['role'] = 'admin'
+    session['name'] = user.name
+    return jsonify({'success': True, 'message': 'Admin login successful', 'user': clean_user(user)})
 
 
 @app.route('/api/register', methods=['POST'])

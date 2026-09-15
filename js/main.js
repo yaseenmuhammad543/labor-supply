@@ -167,10 +167,28 @@ document.addEventListener('DOMContentLoaded', () => {
     return result;
   };
 
+  const adminLoginForm = document.querySelector('[data-admin-login-form]');
+  if (adminLoginForm) {
+    adminLoginForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const payload = Object.fromEntries(new FormData(adminLoginForm).entries());
+      try {
+        const result = await adminRequest('/admin/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        window.location.href = '/admin/admin-dashboard.html';
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+  }
+
   const loadAdminOverview = async () => {
     if (!document.querySelector('[data-admin-stat]')) return;
     try {
-      const result = await adminRequest('/api/admin/overview');
+      const result = await adminRequest('/admin/api/overview');
       Object.entries(result.stats).forEach(([key, value]) => {
         const target = document.querySelector(`[data-admin-stat="${key}"]`);
         if (target) target.textContent = value;
@@ -184,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableBody = document.querySelector('[data-admin-users-body]');
     if (!tableBody) return;
     try {
-      const result = await adminRequest('/api/admin/users');
+      const result = await adminRequest('/admin/api/users');
       tableBody.innerHTML = result.users.map((user) => `
         <tr>
           <td>${user.name}</td>
@@ -197,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tableBody.querySelectorAll('.admin-user-toggle').forEach((button) => {
         button.addEventListener('click', async () => {
           try {
-            await adminRequest(`/api/admin/users/${button.dataset.userId}`, {
+            await adminRequest(`/admin/api/users/${button.dataset.userId}`, {
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ is_active: button.dataset.active !== 'true' }),
@@ -217,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableBody = document.querySelector('[data-admin-jobs-body]');
     if (!tableBody) return;
     try {
-      const result = await adminRequest('/api/admin/jobs');
+      const result = await adminRequest('/admin/api/jobs');
       tableBody.innerHTML = result.jobs.map((job) => `
         <tr>
           <td>${job.title}</td>
@@ -230,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tableBody.querySelectorAll('.admin-job-toggle').forEach((button) => {
         button.addEventListener('click', async () => {
           try {
-            await adminRequest(`/api/admin/jobs/${button.dataset.jobId}`, {
+            await adminRequest(`/admin/api/jobs/${button.dataset.jobId}`, {
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ verified: button.dataset.verified !== 'true' }),
@@ -378,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
   forms.forEach((form) => {
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      if (form === postJobForm) return;
+      if (form === postJobForm || form === adminLoginForm) return;
       const payload = Object.fromEntries(new FormData(form).entries());
       const email = payload.email;
       const password = payload.password;
