@@ -44,8 +44,4 @@ Then visit http://localhost:8000/
 python -m pytest -q
 ```
 
-Demo accounts:
-
-- Worker: `arun@example.com` / `password123`
-- Employer: `hr@abcelectrical.in` / `employer123`
-- Admin: `admin@laborsupply.in` / `admin123`
+There are no built-in demo accounts. Create worker and employer accounts through the registration pages. Create an admin account directly in the production database and keep its credentials private.

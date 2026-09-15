@@ -1,6 +1,7 @@
 import pytest
 
-from app import app, db, Job, User
+from app import app, db, Application, Job, User
+from werkzeug.security import generate_password_hash
 
 
 @pytest.fixture
@@ -16,8 +17,11 @@ def client():
 
 def seed_data():
     if not User.query.filter_by(email='arun@example.com').first():
-        user = User(name='Arun Kumar', email='arun@example.com', password_hash='password123', role='worker')
-        db.session.add(user)
+        db.session.add(User(name='Arun Kumar', email='arun@example.com', password_hash=generate_password_hash('password123'), role='worker'))
+    if not User.query.filter_by(email='hr@abcelectrical.in').first():
+        db.session.add(User(name='ABC Electrical Services', email='hr@abcelectrical.in', password_hash=generate_password_hash('employer123'), role='employer', company_name='ABC Electrical Services'))
+    if not User.query.filter_by(email='admin@laborsupply.in').first():
+        db.session.add(User(name='Platform Admin', email='admin@laborsupply.in', password_hash=generate_password_hash('admin123'), role='admin'))
     if not Job.query.first():
         db.session.add_all([
             Job(title='Electrician', company='ABC Electrical Services', location='Thiruvananthapuram, Kerala', salary='₹18,000 - ₹25,000', employment_type='Full Time', experience='2+ years', qualification='ITI Electrical', description='Install electrical systems', match_score=92, verified=True, skills='Electrical Wiring,Maintenance,Safety'),
