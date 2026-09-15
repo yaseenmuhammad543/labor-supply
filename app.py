@@ -38,6 +38,9 @@ class User(db.Model):
     state = db.Column(db.String(80), nullable=True)
     company_name = db.Column(db.String(150), nullable=True)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
+    location_source = db.Column(db.String(20), nullable=True)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -51,6 +54,9 @@ class User(db.Model):
             'state': self.state,
             'company_name': self.company_name,
             'is_active': self.is_active,
+            'latitude': self.latitude,
+            'longitude': self.longitude,
+            'location_source': self.location_source,
         }
 
 
@@ -127,6 +133,10 @@ with app.app_context():
     if 'is_active' not in users_columns:
         with db.engine.begin() as connection:
             connection.execute(text('ALTER TABLE users ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT 1'))
+    for column_name, column_type in (('latitude', 'FLOAT'), ('longitude', 'FLOAT'), ('location_source', 'VARCHAR(20)')):
+        if column_name not in users_columns:
+            with db.engine.begin() as connection:
+                connection.execute(text(f'ALTER TABLE users ADD COLUMN {column_name} {column_type}'))
 
     def ensure_demo_user(email: str, name: str, password: str, role: str, **kwargs):
         existing = User.query.filter_by(email=email).first()
@@ -507,7 +517,10 @@ def register():
         city=payload.get('city') or payload.get('location'),
         district=payload.get('district'),
         state=payload.get('state'),
-        company_name=payload.get('company_name')
+        company_name=payload.get('company_name'),
+        latitude=payload.get('latitude'),
+        longitude=payload.get('longitude'),
+        location_source=payload.get('location_source') or 'manual',
     )
     db.session.add(user)
     db.session.commit()

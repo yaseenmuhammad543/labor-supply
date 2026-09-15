@@ -52,26 +52,21 @@
             </div>
             <div class="form-field">
               <label for="wlocation">Location</label>
-              <input id="wlocation" name="location" type="text" placeholder="Thiruvananthapuram" />
+              <input id="wlocation" name="location" type="text" placeholder="City or locality" />
+              <button class="btn btn-outline-primary location-button" type="button" data-location-button>Use my current location</button>
+              <small class="location-status" data-location-status>GPS permission is optional. You can choose your location manually.</small>
             </div>
             <div class="form-field">
               <label for="district">District</label>
-              <select id="district" name="district">
-                <option>Thiruvananthapuram</option>
-                <option>Kollam</option>
-                <option>Ernakulam</option>
-                <option>Thrissur</option>
-                <option>Malappuram</option>
-              </select>
+              <select id="district" name="district" data-district-select required></select>
             </div>
             <div class="form-field">
               <label for="state">State</label>
-              <select id="state" name="state">
-                <option>Kerala</option>
-                <option>Tamil Nadu</option>
-                <option>Karnataka</option>
-              </select>
+              <select id="state" name="state" data-state-select required></select>
             </div>
+            <input type="hidden" name="latitude" data-latitude />
+            <input type="hidden" name="longitude" data-longitude />
+            <input type="hidden" name="location_source" data-location-source value="manual" />
             <div class="form-field full">
               <label for="password">Password</label>
               <div class="password-group">
@@ -102,6 +97,7 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/india-locations.js"></script>
     <script src="../js/main.js"></script>
   </body>
 </html>

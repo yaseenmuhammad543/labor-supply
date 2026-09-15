@@ -6,6 +6,84 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchButton = document.querySelector('.btn-search');
   const jobCards = Array.from(document.querySelectorAll('.job-card'));
 
+  const setupLocationSelectors = () => {
+    const stateSelect = document.querySelector('[data-state-select]');
+    const districtSelect = document.querySelector('[data-district-select]');
+    if (!stateSelect || !districtSelect || !window.INDIA_LOCATIONS) return;
+
+    const states = Object.keys(window.INDIA_LOCATIONS).sort();
+    stateSelect.innerHTML = '<option value="">Select state or union territory</option>' +
+      states.map((state) => `<option value="${state}">${state}</option>`).join('');
+
+    const updateDistricts = (selectedDistrict = '') => {
+      const districts = window.INDIA_LOCATIONS[stateSelect.value] || [];
+      districtSelect.innerHTML = '<option value="">Select district</option>' +
+        districts.map((district) => `<option value="${district}">${district}</option>`).join('');
+      if (districts.includes(selectedDistrict)) districtSelect.value = selectedDistrict;
+    };
+
+    stateSelect.addEventListener('change', () => updateDistricts());
+    updateDistricts();
+  };
+
+  const setupLocationPermission = () => {
+    const button = document.querySelector('[data-location-button]');
+    if (!button) return;
+    const status = document.querySelector('[data-location-status]');
+    const latitude = document.querySelector('[data-latitude]');
+    const longitude = document.querySelector('[data-longitude]');
+    const source = document.querySelector('[data-location-source]');
+    const locationInput = document.querySelector('[name="location"]');
+    const stateSelect = document.querySelector('[data-state-select]');
+    const districtSelect = document.querySelector('[data-district-select]');
+
+    button.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        if (status) status.textContent = 'GPS is not available in this browser. Please choose your location manually.';
+        return;
+      }
+      button.disabled = true;
+      button.textContent = 'Requesting location...';
+      if (status) status.textContent = 'Please allow location access in your browser.';
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        latitude.value = position.coords.latitude;
+        longitude.value = position.coords.longitude;
+        source.value = 'gps';
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${position.coords.latitude}&lon=${position.coords.longitude}&zoom=10`, {
+            headers: { Accept: 'application/json' },
+          });
+          const result = await response.json();
+          const address = result.address || {};
+          const detectedState = address.state;
+          const detectedDistrict = address.state_district || address.county || address.city_district;
+          const detectedLocation = address.city || address.town || address.village || address.suburb;
+          if (locationInput && detectedLocation) locationInput.value = detectedLocation;
+          if (stateSelect && window.INDIA_LOCATIONS[detectedState]) {
+            stateSelect.value = detectedState;
+            stateSelect.dispatchEvent(new Event('change'));
+            if (districtSelect && detectedDistrict) {
+              const matchingDistrict = window.INDIA_LOCATIONS[detectedState].find((district) =>
+                detectedDistrict.toLowerCase().includes(district.toLowerCase()) || district.toLowerCase().includes(detectedDistrict.toLowerCase()));
+              if (matchingDistrict) districtSelect.value = matchingDistrict;
+            }
+          }
+          if (status) status.textContent = `Location detected from GPS: ${detectedLocation || 'coordinates saved'}`;
+        } catch (error) {
+          if (status) status.textContent = 'GPS coordinates saved. Please confirm your state and district manually.';
+        } finally {
+          button.disabled = false;
+          button.textContent = 'Update my current location';
+        }
+      }, () => {
+        source.value = 'manual';
+        button.disabled = false;
+        button.textContent = 'Use my current location';
+        if (status) status.textContent = 'Location permission was not granted. You can choose your location manually.';
+      }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 });
+    });
+  };
+
   const renderJobs = (jobs = state.jobs) => {
     const container = document.querySelector('.job-grid');
     if (!container || !jobs.length) return;
@@ -215,6 +293,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const locationInput = document.getElementById('jobLocation');
     const qualificationInput = document.getElementById('qualificationFilter');
     const skillInput = document.getElementById('skillFilter');
+    const districtInput = document.getElementById('districtFilter');
+    const stateInput = document.getElementById('stateFilter');
 
     if (!keywordInput || !locationInput || !qualificationInput || !skillInput) {
       return;
@@ -224,6 +304,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const location = locationInput.value.trim().toLowerCase();
     const qualification = qualificationInput.value.trim().toLowerCase();
     const skill = skillInput.value.trim().toLowerCase();
+    const district = districtInput?.value.trim().toLowerCase() || '';
+    const selectedState = stateInput?.value.trim().toLowerCase() || '';
 
     if (!state.jobs.length) {
       const fallback = Array.from(document.querySelectorAll('.job-card'));
@@ -236,7 +318,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const showCard = (!keyword || title.includes(keyword) || skillText.includes(keyword)) &&
           (!location || locationText.includes(location)) &&
           (!qualification || qualificationText.includes(qualification)) &&
-          (!skill || skillText.includes(skill));
+          (!skill || skillText.includes(skill)) &&
+          (!district || locationText.includes(district)) &&
+          (!selectedState || locationText.includes(selectedState));
         card.style.display = showCard ? 'block' : 'none';
       });
       return;
@@ -247,11 +331,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const locationText = (job.location || '').toLowerCase();
       const skillsText = (job.skills || []).join(' ').toLowerCase();
       const qualificationText = (job.qualification || '').toLowerCase();
+      const jobLocation = locationText;
 
       return (!keyword || title.includes(keyword) || skillsText.includes(keyword)) &&
         (!location || locationText.includes(location)) &&
         (!qualification || qualificationText.includes(qualification)) &&
-        (!skill || skillsText.includes(skill));
+        (!skill || skillsText.includes(skill)) &&
+        (!district || jobLocation.includes(district)) &&
+        (!selectedState || jobLocation.includes(selectedState));
     });
 
     renderJobs(filtered);
@@ -348,4 +435,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadAdminOverview();
   loadAdminUsers();
   loadAdminJobs();
+  setupLocationSelectors();
+  setupLocationPermission();
 });
