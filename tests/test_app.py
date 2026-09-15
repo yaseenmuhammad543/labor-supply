@@ -53,6 +53,18 @@ def test_worker_login(client):
     assert data['user']['role'] == 'worker'
 
 
+def test_employer_login(client):
+    response = client.post('/api/login', json={
+        'email': 'hr@abcelectrical.in',
+        'password': 'employer123',
+        'role': 'employer'
+    })
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['success'] is True
+    assert data['user']['role'] == 'employer'
+
+
 def test_register_user(client):
     response = client.post('/api/register', json={
         'name': 'Praveen Nair',
