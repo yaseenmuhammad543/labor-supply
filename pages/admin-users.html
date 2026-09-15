@@ -21,9 +21,9 @@
         </div>
         <nav class="sidebar-nav">
           <a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
-          <a class="active" href="admin-users.html"><i class="fa-solid fa-users"></i> Workers</a>
+          <a class="active" href="admin-users.html"><i class="fa-solid fa-users"></i> Users</a>
           <a href="#"><i class="fa-solid fa-building"></i> Employers</a>
-          <a href="#"><i class="fa-solid fa-briefcase"></i> Jobs</a>
+          <a href="admin-jobs.html"><i class="fa-solid fa-briefcase"></i> Jobs</a>
           <a href="#"><i class="fa-solid fa-file-lines"></i> Applications</a>
           <a href="#"><i class="fa-solid fa-certificate"></i> Qualifications</a>
           <a href="#"><i class="fa-solid fa-chart-line"></i> Reports</a>
@@ -54,24 +54,7 @@
                   <th>Action</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>Arun Kumar</td>
-                  <td>arun@email.com</td>
-                  <td>Thiruvananthapuram</td>
-                  <td>04 Jul 2026</td>
-                  <td><span class="status-badge verified">ACTIVE</span></td>
-                  <td><div class="action-group"><button class="small-btn">View</button><button class="small-btn">Disable</button></div></td>
-                </tr>
-                <tr>
-                  <td>ABC Electrical Services</td>
-                  <td>hr@abcelectrical.in</td>
-                  <td>Ernakulam</td>
-                  <td>09 Jun 2026</td>
-                  <td><span class="status-badge verified">ACTIVE</span></td>
-                  <td><div class="action-group"><button class="small-btn">View</button><button class="small-btn">Disable</button></div></td>
-                </tr>
-              </tbody>
+              <tbody data-admin-users-body></tbody>
             </table>
           </div>
         </section>

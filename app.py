@@ -37,6 +37,7 @@ class User(db.Model):
     district = db.Column(db.String(80), nullable=True)
     state = db.Column(db.String(80), nullable=True)
     company_name = db.Column(db.String(150), nullable=True)
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -49,6 +50,7 @@ class User(db.Model):
             'district': self.district,
             'state': self.state,
             'company_name': self.company_name,
+            'is_active': self.is_active,
         }
 
 
@@ -120,6 +122,11 @@ with app.app_context():
     if 'employer_id' not in jobs_columns:
         with db.engine.begin() as connection:
             connection.execute(text('ALTER TABLE jobs ADD COLUMN employer_id INTEGER'))
+
+    users_columns = {column['name'] for column in inspect(db.engine).get_columns('users')}
+    if 'is_active' not in users_columns:
+        with db.engine.begin() as connection:
+            connection.execute(text('ALTER TABLE users ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT 1'))
 
     def ensure_demo_user(email: str, name: str, password: str, role: str, **kwargs):
         existing = User.query.filter_by(email=email).first()
@@ -219,6 +226,16 @@ def clean_user(user: User) -> dict[str, Any]:
     return user.to_dict()
 
 
+def require_admin():
+    user_id = session.get('user_id')
+    if not user_id:
+        return None, (jsonify({'success': False, 'message': 'Login required'}), 401)
+    user = db.session.get(User, user_id)
+    if not user or user.role != 'admin':
+        return None, (jsonify({'success': False, 'message': 'Admin access required'}), 403)
+    return user, None
+
+
 @app.route('/')
 def home():
     return send_from_directory(BASE_DIR, 'index.html')
@@ -254,9 +271,93 @@ def health():
     return jsonify({'status': 'ok', 'app': 'labor-supply'})
 
 
+@app.route('/api/admin/overview')
+def admin_overview():
+    _, error = require_admin()
+    if error:
+        return error
+    return jsonify({
+        'success': True,
+        'stats': {
+            'workers': User.query.filter_by(role='worker').count(),
+            'employers': User.query.filter_by(role='employer').count(),
+            'active_jobs': Job.query.filter_by(verified=True).count(),
+            'applications': Application.query.count(),
+        },
+    })
+
+
+@app.route('/api/admin/users')
+def admin_users():
+    _, error = require_admin()
+    if error:
+        return error
+    users = [user.to_dict() for user in User.query.order_by(User.id.desc()).all()]
+    return jsonify({'success': True, 'users': users})
+
+
+@app.route('/api/admin/users/<int:user_id>', methods=['PATCH'])
+def update_admin_user(user_id: int):
+    _, error = require_admin()
+    if error:
+        return error
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({'success': False, 'message': 'User not found'}), 404
+
+    payload = request.get_json(silent=True) or {}
+    if 'is_active' in payload:
+        user.is_active = bool(payload['is_active'])
+    db.session.commit()
+    return jsonify({'success': True, 'user': user.to_dict()})
+
+
+@app.route('/api/admin/jobs')
+def admin_jobs():
+    _, error = require_admin()
+    if error:
+        return error
+    jobs = [job.to_dict() for job in Job.query.order_by(Job.id.desc()).all()]
+    return jsonify({'success': True, 'jobs': jobs})
+
+
+@app.route('/api/admin/jobs/<int:job_id>', methods=['PATCH'])
+def update_admin_job(job_id: int):
+    _, error = require_admin()
+    if error:
+        return error
+    job = db.session.get(Job, job_id)
+    if not job:
+        return jsonify({'success': False, 'message': 'Job not found'}), 404
+
+    payload = request.get_json(silent=True) or {}
+    if 'verified' in payload:
+        job.verified = bool(payload['verified'])
+    db.session.commit()
+    return jsonify({'success': True, 'job': job.to_dict()})
+
+
+@app.route('/api/admin/applications/<int:application_id>', methods=['PATCH'])
+def update_admin_application(application_id: int):
+    _, error = require_admin()
+    if error:
+        return error
+    application = db.session.get(Application, application_id)
+    if not application:
+        return jsonify({'success': False, 'message': 'Application not found'}), 404
+
+    status = (request.get_json(silent=True) or {}).get('status')
+    allowed_statuses = {'applied', 'shortlisted', 'accepted', 'rejected'}
+    if status not in allowed_statuses:
+        return jsonify({'success': False, 'message': 'Invalid application status'}), 400
+    application.status = status
+    db.session.commit()
+    return jsonify({'success': True, 'application': application.to_dict()})
+
+
 @app.route('/api/jobs')
 def get_jobs():
-    jobs = [job.to_dict() for job in Job.query.order_by(Job.id.desc()).all()]
+    jobs = [job.to_dict() for job in Job.query.filter_by(verified=True).order_by(Job.id.desc()).all()]
     return jsonify({'jobs': jobs, 'count': len(jobs)})
 
 
@@ -361,6 +462,8 @@ def login():
         return jsonify({'success': False, 'message': 'User not found'}), 401
     if not check_password_hash(user.password_hash, password):
         return jsonify({'success': False, 'message': 'Incorrect password'}), 401
+    if not user.is_active:
+        return jsonify({'success': False, 'message': 'This account is disabled'}), 403
     if user.role != role:
         return jsonify({'success': False, 'message': 'Role mismatch'}), 401
 

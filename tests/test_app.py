@@ -104,3 +104,36 @@ def test_worker_can_apply_to_job(client):
     data = response.get_json()
     assert data['success'] is True
     assert data['application']['status'] == 'applied'
+
+
+def test_admin_can_view_platform_data_and_disable_user(client):
+    login = client.post('/api/login', json={
+        'email': 'admin@laborsupply.in',
+        'password': 'admin123',
+        'role': 'admin'
+    })
+    assert login.status_code == 200
+
+    dashboard = client.get('/api/admin/overview')
+    assert dashboard.status_code == 200
+    assert dashboard.get_json()['stats']['workers'] >= 1
+
+    users = client.get('/api/admin/users')
+    assert users.status_code == 200
+    arun = next(user for user in users.get_json()['users'] if user['email'] == 'arun@example.com')
+
+    response = client.patch(f"/api/admin/users/{arun['id']}", json={'is_active': False})
+    assert response.status_code == 200
+    assert response.get_json()['user']['is_active'] is False
+
+    hide_job = client.patch('/api/admin/jobs/1', json={'verified': False})
+    assert hide_job.status_code == 200
+    public_jobs = client.get('/api/jobs')
+    assert all(job['id'] != 1 for job in public_jobs.get_json()['jobs'])
+
+    worker_login = client.post('/api/login', json={
+        'email': 'arun@example.com',
+        'password': 'password123',
+        'role': 'worker'
+    })
+    assert worker_login.status_code == 403

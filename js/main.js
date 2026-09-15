@@ -82,6 +82,92 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  const adminRequest = async (url, options = {}) => {
+    const response = await fetch(url, options);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Admin request failed');
+    return result;
+  };
+
+  const loadAdminOverview = async () => {
+    if (!document.querySelector('[data-admin-stat]')) return;
+    try {
+      const result = await adminRequest('/api/admin/overview');
+      Object.entries(result.stats).forEach(([key, value]) => {
+        const target = document.querySelector(`[data-admin-stat="${key}"]`);
+        if (target) target.textContent = value;
+      });
+    } catch (error) {
+      console.warn(error.message);
+    }
+  };
+
+  const loadAdminUsers = async () => {
+    const tableBody = document.querySelector('[data-admin-users-body]');
+    if (!tableBody) return;
+    try {
+      const result = await adminRequest('/api/admin/users');
+      tableBody.innerHTML = result.users.map((user) => `
+        <tr>
+          <td>${user.name}</td>
+          <td>${user.email}</td>
+          <td>${user.city || user.state || '-'}</td>
+          <td><span class="status-badge ${user.is_active ? 'verified' : 'pending'}">${user.is_active ? 'ACTIVE' : 'DISABLED'}</span></td>
+          <td><button class="small-btn admin-user-toggle" data-user-id="${user.id}" data-active="${user.is_active}">${user.is_active ? 'Disable' : 'Enable'}</button></td>
+        </tr>
+      `).join('');
+      tableBody.querySelectorAll('.admin-user-toggle').forEach((button) => {
+        button.addEventListener('click', async () => {
+          try {
+            await adminRequest(`/api/admin/users/${button.dataset.userId}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ is_active: button.dataset.active !== 'true' }),
+            });
+            await loadAdminUsers();
+          } catch (error) {
+            alert(error.message);
+          }
+        });
+      });
+    } catch (error) {
+      tableBody.innerHTML = `<tr><td colspan="5">${error.message}</td></tr>`;
+    }
+  };
+
+  const loadAdminJobs = async () => {
+    const tableBody = document.querySelector('[data-admin-jobs-body]');
+    if (!tableBody) return;
+    try {
+      const result = await adminRequest('/api/admin/jobs');
+      tableBody.innerHTML = result.jobs.map((job) => `
+        <tr>
+          <td>${job.title}</td>
+          <td>${job.company}</td>
+          <td>${job.location}</td>
+          <td><span class="status-badge ${job.verified ? 'verified' : 'pending'}">${job.verified ? 'VISIBLE' : 'HIDDEN'}</span></td>
+          <td><button class="small-btn admin-job-toggle" data-job-id="${job.id}" data-verified="${job.verified}">${job.verified ? 'Hide' : 'Publish'}</button></td>
+        </tr>
+      `).join('');
+      tableBody.querySelectorAll('.admin-job-toggle').forEach((button) => {
+        button.addEventListener('click', async () => {
+          try {
+            await adminRequest(`/api/admin/jobs/${button.dataset.jobId}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ verified: button.dataset.verified !== 'true' }),
+            });
+            await loadAdminJobs();
+          } catch (error) {
+            alert(error.message);
+          }
+        });
+      });
+    } catch (error) {
+      tableBody.innerHTML = `<tr><td colspan="5">${error.message}</td></tr>`;
+    }
+  };
+
   const postJobForm = document.querySelector('[data-post-job-form]');
   if (postJobForm) {
     postJobForm.addEventListener('submit', async (event) => {
@@ -209,9 +295,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const payload = Object.fromEntries(new FormData(form).entries());
       const email = payload.email;
       const password = payload.password;
-      const role = form.querySelector('#company-name') || form.querySelector('#employer-email') ? 'employer' : 'worker';
+      const role = form.querySelector('#company-name') || form.querySelector('#employer-email')
+        ? 'employer'
+        : form.querySelector('#admin-email')
+          ? 'admin'
+          : 'worker';
 
-      const isLogin = form.querySelector('#email') || form.querySelector('#wemail') || form.querySelector('#employer-email');
+      const isLogin = form.querySelector('#email') || form.querySelector('#wemail') || form.querySelector('#employer-email') || form.querySelector('#admin-email');
 
       if (isLogin) {
         const response = await fetch('/api/login', {
@@ -221,7 +311,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         const result = await response.json();
         if (response.ok) {
-          window.location.href = result.user.role === 'employer' ? 'employer-dashboard.html' : 'worker-dashboard.html';
+          window.location.href = result.user.role === 'employer'
+            ? 'employer-dashboard.html'
+            : result.user.role === 'admin'
+              ? 'admin-dashboard.html'
+              : 'worker-dashboard.html';
         } else {
           alert(result.message || 'Login failed');
         }
@@ -251,4 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   loadJobs();
   loadApplications();
+  loadAdminOverview();
+  loadAdminUsers();
+  loadAdminJobs();
 });
