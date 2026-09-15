@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | Labor Supply</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+  </head>
+  <body class="page-shell">
+    <div class="dashboard-shell">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <span class="brand-mark"><i class="fa-solid fa-briefcase"></i></span>
+          <span>Labor Supply</span>
+        </div>
+        <nav class="sidebar-nav">
+          <a class="active" href="admin-dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+          <a href="#"><i class="fa-solid fa-users"></i> Workers</a>
+          <a href="#"><i class="fa-solid fa-building"></i> Employers</a>
+          <a href="#"><i class="fa-solid fa-briefcase"></i> Jobs</a>
+          <a href="#"><i class="fa-solid fa-file-lines"></i> Applications</a>
+          <a href="#"><i class="fa-solid fa-certificate"></i> Qualifications</a>
+          <a href="#"><i class="fa-solid fa-chart-line"></i> Reports</a>
+          <a href="#"><i class="fa-solid fa-list"></i> Categories</a>
+          <a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
+          <a href="../index.html"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        </nav>
+      </aside>
+
+      <main class="dashboard-main">
+        <div class="page-topbar">
+          <div>
+            <span class="eyebrow eyebrow-muted">Admin panel</span>
+            <h1>Platform overview</h1>
+          </div>
+        </div>
+
+        <section class="stat-cards">
+          <div class="stat-card">
+            <span class="label">Total Workers</span>
+            <strong>12,840</strong>
+          </div>
+          <div class="stat-card">
+            <span class="label">Total Employers</span>
+            <strong>3,450</strong>
+          </div>
+          <div class="stat-card">
+            <span class="label">Active Jobs</span>
+            <strong>2,480</strong>
+          </div>
+          <div class="stat-card">
+            <span class="label">Applications</span>
+            <strong>7,520</strong>
+          </div>
+        </section>
+
+        <section class="layout-2">
+          <div class="card-panel">
+            <div class="panel-head">
+              <h3>Pending verification</h3>
+              <span class="chip warning">14 pending</span>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Worker</th>
+                    <th>Qualification</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Arun Kumar</td>
+                    <td>ITI Electrical</td>
+                    <td><span class="status-badge pending">PENDING</span></td>
+                    <td><button class="table-action primary">Verify</button></td>
+                  </tr>
+                  <tr>
+                    <td>Vishnu S.</td>
+                    <td>Safety Training</td>
+                    <td><span class="status-badge pending">PENDING</span></td>
+                    <td><button class="table-action primary">Verify</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card-panel">
+            <div class="panel-head">
+              <h3>Platform reports</h3>
+            </div>
+            <ul class="feature-list">
+              <li><i class="fa-solid fa-check"></i> 86 reports resolved</li>
+              <li><i class="fa-solid fa-check"></i> 19 pending reviews</li>
+              <li><i class="fa-solid fa-check"></i> 42 jobs flagged for review</li>
+            </ul>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/main.js"></script>
+  </body>
+</html>

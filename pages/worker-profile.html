@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Worker Profile | Labor Supply</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+  </head>
+  <body class="page-shell">
+    <div class="dashboard-shell">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <span class="brand-mark"><i class="fa-solid fa-briefcase"></i></span>
+          <span>Labor Supply</span>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="worker-dashboard.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+          <a href="jobs.html"><i class="fa-solid fa-magnifying-glass"></i> Find Jobs</a>
+          <a href="#"><i class="fa-solid fa-file-lines"></i> Applications</a>
+          <a href="#"><i class="fa-solid fa-bookmark"></i> Saved Jobs</a>
+          <a class="active" href="worker-profile.html"><i class="fa-solid fa-user"></i> My Profile</a>
+          <a href="#"><i class="fa-solid fa-bell"></i> Notifications</a>
+          <a href="#"><i class="fa-solid fa-comment"></i> Messages</a>
+          <a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
+          <a href="../index.html"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        </nav>
+      </aside>
+
+      <main class="dashboard-main">
+        <div class="page-topbar">
+          <div>
+            <span class="eyebrow eyebrow-muted">Professional profile</span>
+            <h1>Worker profile</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn btn-primary">Edit Profile</button>
+          </div>
+        </div>
+
+        <section class="layout-2">
+          <div class="profile-card">
+            <div class="profile-avatar">AK</div>
+            <h2>Arun Kumar</h2>
+            <p class="location"><i class="fa-solid fa-location-dot"></i> Thiruvananthapuram, Kerala</p>
+            <p>Experienced electrician with strong skills in residential and commercial electrical systems, troubleshooting, and maintenance work.</p>
+            <div class="skills-wrap">
+              <span>Electrical Wiring</span>
+              <span>Maintenance</span>
+              <span>Safety</span>
+              <span>Panel Installation</span>
+            </div>
+            <ul class="meta-list">
+              <li><i class="fa-solid fa-phone"></i> +91 98765 43210</li>
+              <li><i class="fa-solid fa-envelope"></i> arunkumar@email.com</li>
+            </ul>
+          </div>
+
+          <div class="profile-card">
+            <div class="panel-head">
+              <h3>Profile Strength</h3>
+              <span class="chip success">82%</span>
+            </div>
+            <div class="progress-ring">
+              <div class="progress-ring-inner">82%</div>
+            </div>
+            <p class="text-center text-muted">Complete profile with more qualifications and experience to improve match rate.</p>
+            <div class="action-group">
+              <button class="btn btn-outline-primary">Add Skill</button>
+              <button class="btn btn-outline-primary">Add Education</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card-panel mt-4">
+          <div class="panel-head">
+            <h3>Education</h3>
+            <button class="btn btn-primary">Add Education</button>
+          </div>
+          <ul class="feature-list">
+            <li><i class="fa-solid fa-check"></i> ITI in Electrical Engineering – Govt. ITI, Thiruvananthapuram</li>
+            <li><i class="fa-solid fa-check"></i> Diploma in Electrical Maintenance – Technical Institute, Kerala</li>
+          </ul>
+        </section>
+
+        <section class="card-panel mt-4">
+          <div class="panel-head">
+            <h3>Work Experience</h3>
+            <button class="btn btn-primary">Add Experience</button>
+          </div>
+          <ul class="feature-list">
+            <li><i class="fa-solid fa-check"></i> Electrician – ABC Electrical Services (2021 - Present)</li>
+            <li><i class="fa-solid fa-check"></i> Junior Technician – GreenBuild Infra (2019 - 2021)</li>
+          </ul>
+        </section>
+
+        <section class="card-panel mt-4">
+          <div class="panel-head">
+            <h3>Qualifications</h3>
+            <button class="btn btn-primary">Upload Qualification</button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Qualification</th>
+                  <th>Institution</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ITI Electrical</td>
+                  <td>Govt. ITI</td>
+                  <td><span class="status-badge verified">VERIFIED</span></td>
+                  <td><button class="table-action primary">View</button></td>
+                </tr>
+                <tr>
+                  <td>Safety Certificate</td>
+                  <td>National Safety Council</td>
+                  <td><span class="status-badge pending">PENDING</span></td>
+                  <td><button class="table-action">View</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/main.js"></script>
+  </body>
+</html>

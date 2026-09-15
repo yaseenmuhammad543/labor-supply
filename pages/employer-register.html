@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Employer Registration | Labor Supply</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/responsive.css" />
+  </head>
+  <body class="page-shell">
+    <header class="site-header">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <a class="navbar-brand d-flex align-items-center gap-2" href="../index.html">
+            <span class="brand-mark"><i class="fa-solid fa-briefcase"></i></span>
+            <span class="brand-text">Labor Supply</span>
+          </a>
+          <div class="nav-actions ms-auto d-flex align-items-center gap-2">
+            <a class="btn btn-link btn-login" href="employer-login.html">Login</a>
+            <a class="btn btn-primary" href="register.html">Back</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="auth-shell">
+      <div class="auth-card" style="max-width: 760px;">
+        <div class="auth-header">
+          <span class="eyebrow">Create employer profile</span>
+          <h2>Join as an employer</h2>
+          <p>Hire qualified workers faster with verified profiles.</p>
+        </div>
+
+        <form>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="company-name">Company name</label>
+              <input id="company-name" name="company_name" type="text" placeholder="ABC Electrical Services" />
+            </div>
+            <div class="form-field">
+              <label for="contact-person">Contact person</label>
+              <input id="contact-person" name="contact_person" type="text" placeholder="Name of contact person" />
+            </div>
+            <div class="form-field">
+              <label for="employer-email">Email</label>
+              <input id="employer-email" name="email" type="email" placeholder="company@example.com" />
+            </div>
+            <div class="form-field">
+              <label for="employer-phone">Phone</label>
+              <input id="employer-phone" name="phone" type="tel" placeholder="+91 98765 43210" />
+            </div>
+            <div class="form-field full">
+              <label for="company-address">Company address</label>
+              <input id="company-address" name="company_address" type="text" placeholder="Street address" />
+            </div>
+            <div class="form-field">
+              <label for="employer-district">District</label>
+              <select id="employer-district" name="district">
+                <option>Thiruvananthapuram</option>
+                <option>Kollam</option>
+                <option>Ernakulam</option>
+                <option>Thrissur</option>
+                <option>Kozhikode</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="employer-state">State</label>
+              <select id="employer-state" name="state">
+                <option>Kerala</option>
+                <option>Tamil Nadu</option>
+                <option>Karnataka</option>
+              </select>
+            </div>
+            <div class="form-field full">
+              <label for="employer-description">Company description</label>
+              <textarea id="employer-description" name="company_description" placeholder="Briefly describe your business and hiring needs."></textarea>
+            </div>
+            <div class="form-field full">
+              <label for="employer-pass">Password</label>
+              <div class="password-group">
+                <input id="employer-pass" name="password" type="password" placeholder="Create password" />
+                <button type="button" class="password-toggle" data-target="employer-pass">Show</button>
+              </div>
+            </div>
+            <div class="form-field full">
+              <label for="employer-confirm">Confirm password</label>
+              <div class="password-group">
+                <input id="employer-confirm" name="confirm_password" type="password" placeholder="Confirm password" />
+                <button type="button" class="password-toggle" data-target="employer-confirm">Show</button>
+              </div>
+            </div>
+            <div class="form-field full">
+              <label for="employer-pincode">PIN code</label>
+              <input id="employer-pincode" name="pincode" type="text" placeholder="695001" />
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 mt-3">CREATE EMPLOYER ACCOUNT</button>
+        </form>
+
+        <div class="auth-footer">
+          <p>Already registered? <a href="employer-login.html">Login</a></p>
+        </div>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/main.js"></script>
+  </body>
+</html>
